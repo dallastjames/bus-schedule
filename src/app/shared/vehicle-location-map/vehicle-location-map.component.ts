@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, AfterViewInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { MarkerCollection } from './marker-collection';
@@ -12,16 +12,22 @@ declare var google: any;
   templateUrl: './vehicle-location-map.component.html',
   styleUrls: ['./vehicle-location-map.component.scss']
 })
-export class VehicleLocationMapComponent implements OnDestroy, OnInit {
+export class VehicleLocationMapComponent
+  implements OnDestroy, OnInit, AfterViewInit {
   private interval;
   private map;
   private markers: MarkerCollection;
   private vehicleSubscription: Subscription;
   private routeOptionsSubscription: Subscription;
 
-  constructor(private routeOptions: RouteOptionsService, private vehicleLocations: VehicleLocationsService) { }
+  constructor(
+    private routeOptions: RouteOptionsService,
+    private vehicleLocations: VehicleLocationsService
+  ) {}
 
-  ngOnInit() {
+  ngOnInit() {}
+
+  ngAfterViewInit() {
     this.createMap();
     this.subscribeToVehicleData();
     this.subscribeToRouteOptionsChanges();
@@ -35,31 +41,45 @@ export class VehicleLocationMapComponent implements OnDestroy, OnInit {
 
   private buildMarkers(locs: any) {
     locs.locations.forEach(loc => {
-      this.markers.merge(loc, this.routeOptions.shouldDisplayRoute('sf-muni', loc.routeTag));
+      this.markers.merge(
+        loc,
+        this.routeOptions.shouldDisplayRoute('sf-muni', loc.routeTag)
+      );
     });
   }
 
   private createMap() {
-    this.map = new google.maps.Map(document.getElementById('vehicle-location-map'), {
-      center: new google.maps.LatLng(37.7749, -122.4194),
-      zoom: 12,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    });
+    console.log('map el', document.getElementById('vehicle-location-map'));
+    this.map = new google.maps.Map(
+      document.getElementById('vehicle-location-map'),
+      {
+        center: new google.maps.LatLng(37.7749, -122.4194),
+        zoom: 12,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      }
+    );
     this.markers = new MarkerCollection(this.map);
   }
 
   private subscribeToRouteOptionsChanges() {
-    this.routeOptionsSubscription = this.routeOptions.changedOptions.subscribe(changes =>
-      changes.forEach(change =>
-        this.routeOptions.shouldDisplayRoute(change.agency, change.route) ?
-          this.markers.show(change.route) :
-          this.markers.hide(change.route)));
+    this.routeOptionsSubscription = this.routeOptions.changedOptions.subscribe(
+      changes =>
+        changes.forEach(change =>
+          this.routeOptions.shouldDisplayRoute(change.agency, change.route)
+            ? this.markers.show(change.route)
+            : this.markers.hide(change.route)
+        )
+    );
   }
 
   private subscribeToVehicleData() {
-    this.vehicleSubscription = this.vehicleLocations.data.subscribe(locs => this.buildMarkers(locs));
+    this.vehicleSubscription = this.vehicleLocations.data.subscribe(locs =>
+      this.buildMarkers(locs)
+    );
     this.vehicleLocations.refresh('sf-muni');
-    this.interval = setInterval(() => this.vehicleLocations.refresh('sf-muni'), 15000);
+    this.interval = setInterval(
+      () => this.vehicleLocations.refresh('sf-muni'),
+      15000
+    );
   }
-
 }
