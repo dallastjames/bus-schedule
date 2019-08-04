@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
-import 'rxjs/add/operator/map';
-import { Subject } from 'rxjs/Subject';
+
+import { Subject } from 'rxjs';
 import { parseString } from 'xml2js';
 
 import { environment } from '../../../environments/environment';
