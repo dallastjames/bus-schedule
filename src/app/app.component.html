@@ -1,15 +1,15 @@
-<md-sidenav-container fullscreen>
-  <md-sidenav #sidenav mode="side" class="bus-sidenav">
-   <bus-route-list [routes]="routes"></bus-route-list>
-  </md-sidenav>
+<mat-sidenav-container fullscreen>
+  <mat-sidenav #sidenav mode="side" class="bus-sidenav">
+    <bus-route-list [routes]="routes"></bus-route-list>
+  </mat-sidenav>
 
-  <md-toolbar color="primary">
+  <mat-toolbar color="primary">
     <button class="bus-icon-button" (click)="sidenav.toggle()">
-      <md-icon>menu</md-icon>
-    </button> Bus Locations
+      <mat-icon>menu</mat-icon>
+    </button>
+    Bus Locations
     <span class="bus-toolbar-filler"></span>
-  </md-toolbar>
+  </mat-toolbar>
 
-<bus-vehicle-location-map></bus-vehicle-location-map>
-
-</md-sidenav-container>
+  <bus-vehicle-location-map></bus-vehicle-location-map>
+</mat-sidenav-container>
