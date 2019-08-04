@@ -22,8 +22,9 @@ export class VehicleLocationsService {
     params = params.append('a', agency);
     params = params.append('t', since.toString());
     this.http
-      .get<string>(environment.dataServiceUrl, {
-        params
+      .get(environment.dataServiceUrl, {
+        params,
+        responseType: 'text'
       })
       .subscribe(xml => this.unpackXML(xml));
   }

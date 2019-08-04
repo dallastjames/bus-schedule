@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -17,12 +17,13 @@ export class RoutesService {
   }
 
   refresh(agency: string): void {
+    let params = new HttpParams();
+    params = params.append('command', 'routeList');
+    params = params.append('a', agency);
     this.http
-      .get<string>(environment.dataServiceUrl, {
-        params: {
-          command: 'routeList',
-          a: agency
-        }
+      .get(environment.dataServiceUrl, {
+        params: params,
+        responseType: 'text'
       })
       .subscribe(xml => this.unpackXML(xml));
   }
