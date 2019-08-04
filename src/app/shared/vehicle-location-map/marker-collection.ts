@@ -5,7 +5,7 @@ declare var google: any;
 export class MarkerCollection {
   private hash = {};
 
-  constructor(private map: any) { }
+  constructor(private map: any) {}
 
   merge(loc: VehicleLocation, show: boolean): void {
     if (this.markerExists(loc)) {
@@ -60,7 +60,7 @@ export class MarkerCollection {
       const keys = Object.keys(this.hash[route]);
       keys.forEach(key => {
         this.hash[route][key].setAnimation(google.maps.Animation.DROP);
-        this.hash[route][key].setMap(map)
+        this.hash[route][key].setMap(map);
       });
     }
   }

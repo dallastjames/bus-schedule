@@ -4,14 +4,14 @@ import { LocalStorageService } from 'angular-2-local-storage';
 
 @Injectable()
 export class RouteOptionsService {
-  private options;
+  changedOptions: Subject<Array<{ agency: string; route: string }>>;
 
-  changedOptions: Subject<Array<{ agency: string, route: string }>>
+  private options;
 
   constructor(private localStorage: LocalStorageService) {
     this.options = this.localStorage.get('routeOptions') || {};
     this.changedOptions = new Subject();
-   }
+  }
 
   hideRoute(agency: string, route: string | Array<string>): void {
     const routes = Array.isArray(route) ? route : [route];
@@ -27,10 +27,19 @@ export class RouteOptionsService {
     return this.options[agency] && this.options[agency][route];
   }
 
-  private setRouteVisibility(agency: string, routes: Array< string>, visible: boolean): void {
+  private setRouteVisibility(
+    agency: string,
+    routes: Array<string>,
+    visible: boolean
+  ): void {
     this.options[agency] = this.options[agency] || {};
-    routes.forEach(route => this.options[agency][route] = visible);
-    this.changedOptions.next(routes.map<{ agency: string, route: string }>(r => ({ agency: agency, route: r })));
+    routes.forEach(route => (this.options[agency][route] = visible));
+    this.changedOptions.next(
+      routes.map<{ agency: string; route: string }>(r => ({
+        agency: agency,
+        route: r
+      }))
+    );
     this.localStorage.set('routeOptions', this.options);
   }
 }
