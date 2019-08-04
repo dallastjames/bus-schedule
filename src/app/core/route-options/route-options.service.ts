@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { LocalStorageService } from 'angular-2-local-storage';
 
 @Injectable()
 export class RouteOptionsService {
@@ -8,8 +7,9 @@ export class RouteOptionsService {
 
   private options;
 
-  constructor(private localStorage: LocalStorageService) {
-    this.options = this.localStorage.get('routeOptions') || {};
+  constructor() {
+    // this.options = this.localStorage.get('routeOptions') || {};
+    this.options = {};
     this.changedOptions = new Subject();
   }
 
@@ -40,6 +40,6 @@ export class RouteOptionsService {
         route: r
       }))
     );
-    this.localStorage.set('routeOptions', this.options);
+    // this.localStorage.set('routeOptions', this.options);
   }
 }

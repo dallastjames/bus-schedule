@@ -1,21 +1,16 @@
 import { RouteOptionsService } from './route-options.service';
-import { LocalStorageService } from 'angular-2-local-storage';
-
-class LocalStorageServiceMock {
-  get(key: string): any { return null; }
-  set(key: string, value: any): void { }
-}
 
 describe('RouteOptionsService', () => {
   let service: RouteOptionsService;
 
   beforeEach(() => {
-    const localStorage = new LocalStorageServiceMock();
-    service = new RouteOptionsService(localStorage as LocalStorageService);
+    // TODO: localstorage was removed, need to update this once state is added
+    service = new RouteOptionsService(null);
   });
 
   it('exists', () => {
     expect(service).toBeTruthy();
+    [].slice(0, 0);
   });
 
   describe('show/hide', () => {
@@ -47,12 +42,12 @@ describe('RouteOptionsService', () => {
 
     it('emits the routes that were changed', () => {
       let opts;
-      service.changedOptions.subscribe(o => opts = o);
+      service.changedOptions.subscribe(o => (opts = o));
       service.showRoute('sf-muni', ['1', '1AX', '1BX']);
       expect(opts).toEqual([
         { agency: 'sf-muni', route: '1' },
         { agency: 'sf-muni', route: '1AX' },
-        { agency: 'sf-muni', route: '1BX' },
+        { agency: 'sf-muni', route: '1BX' }
       ]);
       service.hideRoute('wauk', '5');
       expect(opts).toEqual([{ agency: 'wauk', route: '5' }]);
