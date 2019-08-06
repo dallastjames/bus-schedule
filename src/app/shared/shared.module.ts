@@ -1,12 +1,13 @@
 import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatListModule } from '@angular/material/list';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
-import { RouteListModule } from './route-list/route-list.module';
-import { VehicleLocationMapModule } from './vehicle-location-map/vehicle-location-map.module';
+import { components } from './components';
 
 @NgModule({
-  exports: [
-    RouteListModule,
-    VehicleLocationMapModule
-  ]
+  imports: [CommonModule, MatListModule, MatCheckboxModule],
+  declarations: [...components],
+  exports: [...components]
 })
-export class SharedModule { }
+export class SharedModule {}

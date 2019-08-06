@@ -6,4 +6,4 @@ import { VehicleLocationMapComponent } from './vehicle-location-map.component';
   declarations: [VehicleLocationMapComponent],
   exports: [VehicleLocationMapComponent]
 })
-export class VehicleLocationMapModule { }
+export class VehicleLocationMapModule {}

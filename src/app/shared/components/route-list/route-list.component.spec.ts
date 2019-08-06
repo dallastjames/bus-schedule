@@ -1,10 +1,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatListModule } from '@angular/material/list';
 
-import { RouteItemComponent } from './route-item/route-item.component';
 import { RouteListComponent } from './route-list.component';
+import { RouteListItemComponent } from '../route-list-item/route-list-item.component';
+import { MatListModule } from '@angular/material/list';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 describe('RouteListComponent', () => {
   let component: RouteListComponent;
@@ -12,8 +11,8 @@ describe('RouteListComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [RouteItemComponent, RouteListComponent],
-      imports: [FormsModule, MatCheckboxModule, MatListModule]
+      imports: [MatListModule, MatCheckboxModule],
+      declarations: [RouteListComponent, RouteListItemComponent]
     }).compileComponents();
   }));
 
@@ -23,7 +22,7 @@ describe('RouteListComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should be created', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 });
