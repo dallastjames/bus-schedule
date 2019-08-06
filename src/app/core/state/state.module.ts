@@ -10,14 +10,15 @@ import { throwIfAlreadyLoaded } from '../module-import-guard';
 import { environment } from '@bus/env';
 
 import { RoutesState } from './routes.state';
+import { VehiclesState } from './vehicles.state';
 
 // Export States Here
-export { RoutesState };
+export { RoutesState, VehiclesState };
 
 @NgModule({
   imports: [
     CommonModule,
-    NgxsModule.forRoot([RoutesState], {
+    NgxsModule.forRoot([RoutesState, VehiclesState], {
       developmentMode: !environment.production
     }),
     NgxsStoragePluginModule.forRoot(),

@@ -19,7 +19,7 @@ export class RoutesService {
     params = params.append('a', agency);
     return this.http
       .get(environment.dataServiceUrl, {
-        params: params,
+        params,
         responseType: 'text'
       })
       .pipe(

@@ -1,6 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { VehicleLocationMapComponent } from './vehicle-location-map.component';
+import { NgxsStateModule } from '@bus/state';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('VehicleLocationMapComponent', () => {
   let component: VehicleLocationMapComponent;
@@ -25,6 +27,7 @@ describe('VehicleLocationMapComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
+      imports: [NgxsStateModule, HttpClientTestingModule],
       declarations: [VehicleLocationMapComponent]
     }).compileComponents();
   }));

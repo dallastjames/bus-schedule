@@ -6,6 +6,8 @@ import {
   ElementRef,
   AfterViewInit
 } from '@angular/core';
+import { Emitter, Emittable } from '@ngxs-labs/emitter';
+import { VehiclesState } from '@bus/state';
 
 declare var google: any;
 
@@ -19,6 +21,9 @@ export class VehicleLocationMapComponent implements OnInit, AfterViewInit {
   @ViewChild('vehicleLocationMap', { static: true, read: ElementRef })
   mapEl: ElementRef<HTMLDivElement>;
 
+  @Emitter(VehiclesState.requestUpdate)
+  updateVehiclePositions: Emittable<string>;
+
   private map: google.maps.Map;
 
   constructor() {}
@@ -27,6 +32,7 @@ export class VehicleLocationMapComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     this.createMap();
+    this.updateMap();
   }
 
   private createMap() {
@@ -35,5 +41,9 @@ export class VehicleLocationMapComponent implements OnInit, AfterViewInit {
       zoom: 12,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     });
+  }
+
+  private updateMap() {
+    this.updateVehiclePositions.emit('sf-muni');
   }
 }
