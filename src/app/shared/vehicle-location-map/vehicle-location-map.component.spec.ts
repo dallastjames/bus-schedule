@@ -1,21 +1,24 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { Subject } from 'rxjs/Subject';
-import { LocalStorageService } from 'angular-2-local-storage';
+import { Subject } from 'rxjs';
 
 import { RouteOptionsService } from '../../core/route-options/route-options.service';
 import { VehicleLocationMapComponent } from './vehicle-location-map.component';
 import { VehicleLocationsService } from '../../core/vehicle-locations/vehicle-locations.service';
 
 class LocalStorageServiceMock {
-  get(key: string): any { return null; }
-  set(key: string, value: any): void { }
+  get(key: string): any {
+    return null;
+  }
+  set(key: string, value: any): void {}
 }
 
 class VehicleLocationServiceMock {
   data: Subject<any>;
   testLastTime: number;
   testVehicles: Array<any> = [];
-  constructor() { this.data = new Subject; }
+  constructor() {
+    this.data = new Subject();
+  }
   refresh(agency: string, since?: number): void {
     this.data.next({
       lastTime: this.testLastTime,
@@ -35,12 +38,12 @@ describe('VehicleLocationMapComponent', () => {
           BOUNCE: 1,
           DROP: 2
         },
-        LatLng: function() { },
-        Map: function() { },
+        LatLng: function() {},
+        Map: function() {},
         MapTypeId: {
           ROADMAP: 1
         },
-        Marker: function() { }
+        Marker: function() {}
       }
     };
   });
@@ -49,9 +52,11 @@ describe('VehicleLocationMapComponent', () => {
     TestBed.configureTestingModule({
       declarations: [VehicleLocationMapComponent],
       providers: [
-        { provide: LocalStorageService, useClass: LocalStorageServiceMock },
         RouteOptionsService,
-        { provide: VehicleLocationsService, useClass: VehicleLocationServiceMock }
+        {
+          provide: VehicleLocationsService,
+          useClass: VehicleLocationServiceMock
+        }
       ]
     }).compileComponents();
   }));

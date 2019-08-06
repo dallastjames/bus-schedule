@@ -49,7 +49,6 @@ export class VehicleLocationMapComponent
   }
 
   private createMap() {
-    console.log('map el', document.getElementById('vehicle-location-map'));
     this.map = new google.maps.Map(
       document.getElementById('vehicle-location-map'),
       {

@@ -2,9 +2,9 @@ import { MarkerCollection } from './marker-collection';
 import { VehicleLocation } from '../../core/vehicle-locations/vehicle-location';
 
 class MarkerMock {
-  setAnimation() { }
-  setMap() { }
-  setPosition() { }
+  setAnimation() {}
+  setMap() {}
+  setPosition() {}
 }
 
 declare var google: any;
@@ -19,12 +19,12 @@ describe('MarkerCollection', () => {
           BOUNCE: 1,
           DROP: 2
         },
-        LatLng: function() { },
-        Map: function() { },
+        LatLng: function() {},
+        Map: function() {},
         MapTypeId: {
           ROADMAP: 1
         },
-        Marker: function() { }
+        Marker: function() {}
       }
     };
   });
@@ -42,14 +42,19 @@ describe('MarkerCollection', () => {
     it('adds a new marker', () => {
       const map = { name: 'I am map' };
       const m = new MarkerCollection(map);
-      spyOn(google.maps, 'LatLng').and.returnValue({
+      google.maps.LatLng = jest.fn();
+      google.maps.Marker = jest.fn();
+      google.maps.LatLng.mockImplementationOnce(() => ({
         lat: testVehicle.lat,
         lng: testVehicle.lon
-      });
-      spyOn(google.maps, 'Marker').and.returnValue({});
+      }));
+      google.maps.Marker.mockImplementationOnce(() => {});
       m.merge(testVehicle, true);
       expect(google.maps.LatLng).toHaveBeenCalledTimes(1);
-      expect(google.maps.LatLng).toHaveBeenCalledWith(testVehicle.lat, testVehicle.lon);
+      expect(google.maps.LatLng).toHaveBeenCalledWith(
+        testVehicle.lat,
+        testVehicle.lon
+      );
       expect(google.maps.Marker).toHaveBeenCalledTimes(1);
       expect(google.maps.Marker).toHaveBeenCalledWith({
         position: { lat: testVehicle.lat, lng: testVehicle.lon },
@@ -62,14 +67,19 @@ describe('MarkerCollection', () => {
     it('creates a new marker without a map if show is false', () => {
       const map = { name: 'I am map' };
       const m = new MarkerCollection(map);
-      spyOn(google.maps, 'LatLng').and.returnValue({
+      google.maps.LatLng = jest.fn();
+      google.maps.Marker = jest.fn();
+      google.maps.LatLng.mockImplementationOnce(() => ({
         lat: testVehicle.lat,
         lng: testVehicle.lon
-      });
-      spyOn(google.maps, 'Marker').and.returnValue({});
+      }));
+      google.maps.Marker.mockImplementationOnce(() => {});
       m.merge(testVehicle, false);
       expect(google.maps.LatLng).toHaveBeenCalledTimes(1);
-      expect(google.maps.LatLng).toHaveBeenCalledWith(testVehicle.lat, testVehicle.lon);
+      expect(google.maps.LatLng).toHaveBeenCalledWith(
+        testVehicle.lat,
+        testVehicle.lon
+      );
       expect(google.maps.Marker).toHaveBeenCalledTimes(1);
       expect(google.maps.Marker).toHaveBeenCalledWith({
         position: { lat: testVehicle.lat, lng: testVehicle.lon },
@@ -79,22 +89,23 @@ describe('MarkerCollection', () => {
       });
     });
 
-
     it('moves an existing marker', () => {
       const map = { name: 'I am map' };
       const m = new MarkerCollection(map);
-      spyOn(google.maps, 'LatLng').and.returnValue({
+      google.maps.LatLng = jest.fn();
+      google.maps.Marker = jest.fn();
+      google.maps.LatLng.mockImplementationOnce(() => ({
         lat: testVehicle.lat,
         lng: testVehicle.lon
-      });
+      }));
       const marker = new MarkerMock();
-      spyOn(google.maps, 'Marker').and.returnValue(marker);
+      marker.setPosition = jest.fn();
+      google.maps.Marker.mockImplementationOnce(() => marker);
       m.merge(testVehicle, true);
-      spyOn(marker, 'setPosition');
       testVehicle.lat = '74';
       testVehicle.lon = '-121.98';
       m.merge(testVehicle, true);
-      expect(marker.setPosition).toHaveBeenCalledTimes(1);
+      expect((marker.setPosition as jest.Mock).mock.calls.length).toEqual(1);
     });
   });
 

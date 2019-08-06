@@ -25,7 +25,6 @@ export class MarkerCollection {
   }
 
   private addMarker(loc: VehicleLocation, show: boolean): void {
-    console.log(google.maps);
     this.hash[loc.routeTag] = this.hash[loc.routeTag] || {};
     this.hash[loc.routeTag][loc.id] = new google.maps.Marker({
       position: new google.maps.LatLng(loc.lat, loc.lon),

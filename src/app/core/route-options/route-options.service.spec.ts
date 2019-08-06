@@ -5,7 +5,7 @@ describe('RouteOptionsService', () => {
 
   beforeEach(() => {
     // TODO: localstorage was removed, need to update this once state is added
-    service = new RouteOptionsService(null);
+    service = new RouteOptionsService();
   });
 
   it('exists', () => {
