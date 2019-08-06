@@ -2,7 +2,9 @@ import {
   Component,
   OnInit,
   ChangeDetectionStrategy,
-  Input
+  Input,
+  Output,
+  EventEmitter
 } from '@angular/core';
 import { Route } from '@bus/models';
 
@@ -15,10 +17,12 @@ import { Route } from '@bus/models';
 export class RouteListItemComponent implements OnInit {
   @Input()
   route: Route;
-
-  checked: boolean = false;
+  @Output()
+  toggle: EventEmitter<Route> = new EventEmitter<Route>();
 
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log('init');
+  }
 }

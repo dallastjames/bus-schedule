@@ -17,6 +17,11 @@ describe('RouteListItemComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(RouteListItemComponent);
     component = fixture.componentInstance;
+    component.route = {
+      selected: false,
+      tag: '1',
+      title: '1-Route'
+    };
     fixture.detectChanges();
   });
 

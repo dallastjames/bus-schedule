@@ -2,7 +2,10 @@ import {
   Component,
   OnInit,
   ChangeDetectionStrategy,
-  Input
+  Input,
+  Output,
+  EventEmitter,
+  TrackByFunction
 } from '@angular/core';
 import { Route } from '@bus/models';
 
@@ -15,8 +18,14 @@ import { Route } from '@bus/models';
 export class RouteListComponent implements OnInit {
   @Input()
   routes: Route[] = [];
+  @Output()
+  toggleRoute: EventEmitter<Route> = new EventEmitter<Route>();
 
   constructor() {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    console.log('init2');
+  }
+
+  trackByFn: TrackByFunction<Route> = (index, item) => item.title;
 }

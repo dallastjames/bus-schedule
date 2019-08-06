@@ -1,6 +1,9 @@
 <mat-sidenav-container fullscreen>
   <mat-sidenav #sidenav mode="side" class="bus-sidenav">
-    <bus-route-list [routes]="routes$ | async"></bus-route-list>
+    <bus-route-list
+      [routes]="routes$ | async"
+      (toggleRoute)="toggleRoute.emit($event)"
+    ></bus-route-list>
   </mat-sidenav>
 
   <mat-toolbar color="primary">

@@ -42,4 +42,23 @@ export class RoutesState {
       return state;
     });
   }
+
+  @Receiver()
+  @ImmutableContext()
+  public static async toggleRoute(
+    { setState }: StateContext<RoutesStateModel>,
+    { payload }: { payload: Route }
+  ): Promise<void> {
+    setState((state: RoutesStateModel) => {
+      const routeIndex = state.routes.findIndex(r => r.title === payload.title);
+      if (routeIndex > -1) {
+        const route = state.routes[routeIndex];
+        // Toggle, but we need to make our check a bit more specific
+        // to handle the case when selected === undefined
+        route.selected = route.selected === true ? false : true;
+        state.routes[routeIndex] = route;
+      }
+      return state;
+    });
+  }
 }
