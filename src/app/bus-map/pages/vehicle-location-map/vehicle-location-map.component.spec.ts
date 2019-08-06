@@ -6,11 +6,27 @@ describe('VehicleLocationMapComponent', () => {
   let component: VehicleLocationMapComponent;
   let fixture: ComponentFixture<VehicleLocationMapComponent>;
 
+  beforeAll(() => {
+    window['google'] = {
+      maps: {
+        Animation: {
+          BOUNCE: 1,
+          DROP: 2
+        },
+        LatLng: function() {},
+        Map: function() {},
+        MapTypeId: {
+          ROADMAP: 1
+        },
+        Marker: function() {}
+      }
+    };
+  });
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ VehicleLocationMapComponent ]
-    })
-    .compileComponents();
+      declarations: [VehicleLocationMapComponent]
+    }).compileComponents();
   }));
 
   beforeEach(() => {

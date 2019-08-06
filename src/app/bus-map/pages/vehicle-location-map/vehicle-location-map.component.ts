@@ -1,4 +1,13 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  ViewChild,
+  ElementRef,
+  AfterViewInit
+} from '@angular/core';
+
+declare var google: any;
 
 @Component({
   selector: 'bus-vehicle-location-map',
@@ -6,11 +15,25 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
   styleUrls: ['./vehicle-location-map.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class VehicleLocationMapComponent implements OnInit {
+export class VehicleLocationMapComponent implements OnInit, AfterViewInit {
+  @ViewChild('vehicleLocationMap', { static: true, read: ElementRef })
+  mapEl: ElementRef<HTMLDivElement>;
 
-  constructor() { }
+  private map: google.maps.Map;
 
-  ngOnInit() {
+  constructor() {}
+
+  ngOnInit() {}
+
+  ngAfterViewInit() {
+    this.createMap();
   }
 
+  private createMap() {
+    this.map = new google.maps.Map(this.mapEl.nativeElement, {
+      center: new google.maps.LatLng(37.7749, -122.4194),
+      zoom: 12,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    });
+  }
 }
