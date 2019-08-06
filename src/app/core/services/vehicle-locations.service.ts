@@ -4,8 +4,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
 import { parseString } from 'xml2js';
 
-import { environment } from '../../../environments/environment';
-import { VehicleLoctationsResponse } from '../models/vehicle/vehicle-locations-response';
+import { environment } from '@bus/env';
+import { VehicleLoctationsResponse } from '@bus/models';
 
 @Injectable({
   providedIn: 'root'

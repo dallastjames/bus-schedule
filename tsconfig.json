@@ -17,6 +17,7 @@
     "lib": ["es2016", "dom"],
     "module": "esnext",
     "paths": {
+      "@bus/env": ["environments/environment.ts"],
       "@bus/models": ["app/core/models/index.ts"],
       "@bus/services": ["app/core/services/index.ts"],
       "@bus/state": ["app/core/state/index.ts"]

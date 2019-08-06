@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 import { parseString } from 'xml2js';
 
-import { environment } from '../../../environments/environment';
-import { Route } from '../models/route/route';
+import { environment } from '@bus/env';
+import { Route } from '@bus/models';
 
 @Injectable({
   providedIn: 'root'

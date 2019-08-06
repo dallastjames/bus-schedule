@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { Route } from '../../core/models/route/route';
+import { Route } from '@bus/models';
 
 @Component({
   selector: 'bus-route-list',
