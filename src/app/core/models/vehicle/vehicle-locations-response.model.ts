@@ -1,4 +1,4 @@
-import { VehicleLocation } from './vehicle-location';
+import { VehicleLocation } from './vehicle-location.model';
 
 export interface VehicleLoctationsResponse {
   lastTime: number;
