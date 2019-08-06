@@ -1,9 +1,8 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Subject } from 'rxjs';
 
-import { RouteOptionsService } from '../../core/route-options/route-options.service';
+import { RouteOptionsService, VehicleLocationsService } from '@bus/services';
 import { VehicleLocationMapComponent } from './vehicle-location-map.component';
-import { VehicleLocationsService } from '../../core/vehicle-locations/vehicle-locations.service';
 
 class LocalStorageServiceMock {
   get(key: string): any {

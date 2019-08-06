@@ -6,9 +6,11 @@ import { map } from 'rxjs/operators';
 import { parseString } from 'xml2js';
 
 import { environment } from '../../../environments/environment';
-import { Route } from './route';
+import { Route } from '../models/route/route';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class RoutesService {
   data: Subject<Array<Route>>;
 

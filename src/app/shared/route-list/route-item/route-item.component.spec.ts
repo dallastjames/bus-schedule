@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
-import { RouteOptionsService } from '../../../core/route-options/route-options.service';
+import { RouteOptionsService } from '@bus/services';
 import { RouteItemComponent } from './route-item.component';
 
 class RouteOptionsServiceMock {
@@ -21,7 +21,9 @@ describe('RouteItemComponent', () => {
     TestBed.configureTestingModule({
       declarations: [RouteItemComponent],
       imports: [FormsModule, MatCheckboxModule],
-      providers: [{ provide: RouteOptionsService, useClass: RouteOptionsServiceMock }]
+      providers: [
+        { provide: RouteOptionsService, useClass: RouteOptionsServiceMock }
+      ]
     }).compileComponents();
   }));
 

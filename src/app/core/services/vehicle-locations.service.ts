@@ -5,9 +5,11 @@ import { Subject } from 'rxjs';
 import { parseString } from 'xml2js';
 
 import { environment } from '../../../environments/environment';
-import { VehicleLoctationsResponse } from './vehicle-locations-response';
+import { VehicleLoctationsResponse } from '../models/vehicle/vehicle-locations-response';
 
-@Injectable()
+@Injectable({
+  providedIn: 'root'
+})
 export class VehicleLocationsService {
   data: Subject<VehicleLoctationsResponse>;
 

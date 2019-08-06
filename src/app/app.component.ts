@@ -1,9 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 
-import { RouteOptionsService } from './core/route-options/route-options.service';
-import { Route } from './core/routes/route';
-import { RoutesService } from './core/routes/routes.service';
+import { RouteOptionsService, RoutesService } from '@bus/services';
+import { Route } from '@bus/models';
 
 @Component({
   selector: 'bus-root',

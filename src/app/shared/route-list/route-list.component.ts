@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 
-import { Route } from '../../core/routes/route';
+import { Route } from '../../core/models/route/route';
 
 @Component({
   selector: 'bus-route-list',
@@ -8,12 +8,9 @@ import { Route } from '../../core/routes/route';
   styleUrls: ['./route-list.component.scss']
 })
 export class RouteListComponent implements OnInit {
-
   @Input() routes: Array<Route>;
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

@@ -12,5 +12,6 @@ module.exports = {
       astTransformers: ['jest-preset-angular/InlineHtmlStripStylesTransformer']
     }
   },
-  setupFilesAfterEnv: ['./src/test-setup.ts']
+  setupFilesAfterEnv: ['./src/test-setup.ts'],
+  moduleNameMapper: require('./jest-moduleMapper')
 };

@@ -1,5 +1,5 @@
 import { MarkerCollection } from './marker-collection';
-import { VehicleLocation } from '../../core/vehicle-locations/vehicle-location';
+import { VehicleLocation } from '@bus/models';
 
 class MarkerMock {
   setAnimation() {}

@@ -1,4 +1,4 @@
-import { VehicleLocation } from '../../core/vehicle-locations/vehicle-location';
+import { VehicleLocation } from '@bus/models';
 
 declare var google: any;
 
