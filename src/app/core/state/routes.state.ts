@@ -38,6 +38,14 @@ export class RoutesState {
       .loadAllRoutes(payload)
       .toPromise();
     setState((state: RoutesStateModel) => {
+      routes.map(route => {
+        const routeInState = state.routes.find(r => route.title === r.title);
+        if (!!routeInState) {
+          route.selected = routeInState.selected;
+        } else {
+          route.selected = false;
+        }
+      });
       state.routes = routes;
       return state;
     });
@@ -53,9 +61,7 @@ export class RoutesState {
       const routeIndex = state.routes.findIndex(r => r.title === payload.title);
       if (routeIndex > -1) {
         const route = state.routes[routeIndex];
-        // Toggle, but we need to make our check a bit more specific
-        // to handle the case when selected === undefined
-        route.selected = route.selected === true ? false : true;
+        route.selected = !route.selected;
         state.routes[routeIndex] = route;
       }
       return state;
