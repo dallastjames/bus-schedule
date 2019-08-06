@@ -1,4 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Select } from '@ngxs/store';
+import { Observable } from 'rxjs';
+import { RoutesState } from '@bus/state';
+import { Route } from '@bus/models';
 
 @Component({
   selector: 'bus-bus-map-container',
@@ -7,10 +11,10 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BusMapContainerComponent implements OnInit {
+  @Select(RoutesState.routes)
+  routes$: Observable<Route[]>;
 
-  constructor() { }
+  constructor() {}
 
-  ngOnInit() {
-  }
-
+  ngOnInit() {}
 }

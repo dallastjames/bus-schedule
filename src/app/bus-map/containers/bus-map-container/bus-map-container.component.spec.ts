@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -6,7 +7,8 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { BusMapContainerComponent } from './bus-map-container.component';
 import { SharedModule } from 'app/shared/shared.module';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { NgxsStateModule } from '@bus/state';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 describe('BusMapContainerComponent', () => {
   let component: BusMapContainerComponent;
@@ -20,7 +22,9 @@ describe('BusMapContainerComponent', () => {
         MatSidenavModule,
         MatToolbarModule,
         MatIconModule,
-        SharedModule
+        SharedModule,
+        HttpClientTestingModule,
+        NgxsStateModule
       ],
       declarations: [BusMapContainerComponent]
     }).compileComponents();

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Subject } from 'rxjs';
-
-import { parseString } from 'xml2js';
+import { Observable, bindNodeCallback } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+import { parseString, convertableToString } from 'xml2js';
 
 import { environment } from '@bus/env';
 import { Route } from '@bus/models';
@@ -11,37 +11,50 @@ import { Route } from '@bus/models';
   providedIn: 'root'
 })
 export class RoutesService {
-  data: Subject<Array<Route>>;
+  constructor(private http: HttpClient) {}
 
-  constructor(private http: HttpClient) {
-    this.data = new Subject();
-  }
-
-  refresh(agency: string): void {
+  loadAllRoutes(agency: string): Observable<Route[]> {
     let params = new HttpParams();
     params = params.append('command', 'routeList');
     params = params.append('a', agency);
-    this.http
+    return this.http
       .get(environment.dataServiceUrl, {
         params: params,
         responseType: 'text'
       })
-      .subscribe(xml => this.unpackXML(xml));
-  }
-
-  private unpackXML(xml: string) {
-    parseString(
-      xml,
-      { explicitArray: false, mergeAttrs: true },
-      (err, result) => {
-        this.data.next(
-          !result.body.route
-            ? []
-            : Array.isArray(result.body.route)
-            ? result.body.route
-            : [result.body.route]
-        );
-      }
-    );
+      .pipe(
+        switchMap(xml =>
+          bindNodeCallback<
+            convertableToString,
+            any,
+            { body: { route: Route[] } }
+            // tslint:disable-next-line: ter-func-call-spacing
+          >(parseString)(xml, {
+            explicitArray: false,
+            mergeAttrs: true
+          })
+        ),
+        map(xmlRes => {
+          if (!!xmlRes && !!xmlRes.body && !!xmlRes.body.route) {
+            if (Array.isArray(xmlRes.body.route)) {
+              return xmlRes.body.route;
+            } else {
+              return [xmlRes.body.route as Route];
+            }
+          }
+          return [];
+        }),
+        map(routes =>
+          routes.sort((a, b) => {
+            if (a.title > b.title) {
+              return 1;
+            } else if (a.title < b.title) {
+              return -1;
+            } else {
+              return 0;
+            }
+          })
+        )
+      );
   }
 }
