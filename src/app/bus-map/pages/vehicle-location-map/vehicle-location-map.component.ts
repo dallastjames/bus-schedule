@@ -10,9 +10,9 @@ import {
 import { Emitter, Emittable } from '@ngxs-labs/emitter';
 import { VehiclesState, RoutesState } from '@bus/state';
 import { Select } from '@ngxs/store';
-import { Observable, Subscription, combineLatest, interval } from 'rxjs';
+import { Observable, combineLatest, interval, Subject } from 'rxjs';
 import { Route } from '@bus/models';
-import { startWith } from 'rxjs/operators';
+import { startWith, takeUntil } from 'rxjs/operators';
 
 declare var google: any;
 
@@ -35,7 +35,7 @@ export class VehicleLocationMapComponent
   markers$: Observable<{ [key: string]: google.maps.Marker[] }>;
 
   private map: google.maps.Map;
-  private markersWatcher: Subscription = new Subscription();
+  private unsub: Subject<void> = new Subject<void>();
 
   constructor() {}
 
@@ -43,36 +43,13 @@ export class VehicleLocationMapComponent
 
   ngAfterViewInit() {
     this.createMap();
-    // If no map was created, then we shouldn't try to add markers
-    if (!!this.map) {
-      this.markersWatcher.add(
-        combineLatest(this.selectedRoutes$, this.markers$).subscribe(
-          ([routes, markers]: [
-            Route[],
-            { [key: string]: google.maps.Marker[] }
-          ]) => {
-            const selectedRouteTags = routes.map(route => route.tag);
-            for (const routeTag of Object.keys(markers)) {
-              const showMarker = selectedRouteTags.includes(routeTag);
-              for (const marker of markers[routeTag]) {
-                marker.setMap(showMarker ? this.map : null);
-              }
-            }
-          }
-        )
-      );
-      this.markersWatcher.add(
-        interval(15000)
-          .pipe(startWith(null))
-          .subscribe(() => this.updateVehiclePositions.emit('sf-muni'))
-      );
-    }
+    this.createMarkerWatcher();
+    this.createIntervalUpdater();
   }
 
   ngOnDestroy() {
-    if (!!this.markersWatcher) {
-      this.markersWatcher.unsubscribe();
-    }
+    this.unsub.next();
+    this.unsub.complete();
   }
 
   private createMap() {
@@ -81,5 +58,33 @@ export class VehicleLocationMapComponent
       zoom: 12,
       mapTypeId: google.maps.MapTypeId.ROADMAP
     });
+  }
+
+  private createMarkerWatcher() {
+    combineLatest(this.selectedRoutes$, this.markers$)
+      .pipe(takeUntil(this.unsub))
+      .subscribe(
+        ([routes, markers]: [
+          Route[],
+          { [key: string]: google.maps.Marker[] }
+        ]) => {
+          const selectedRouteTags = routes.map(route => route.tag);
+          for (const routeTag of Object.keys(markers)) {
+            const showMarker = selectedRouteTags.includes(routeTag);
+            for (const marker of markers[routeTag]) {
+              marker.setMap(showMarker ? this.map : null);
+            }
+          }
+        }
+      );
+  }
+
+  private createIntervalUpdater() {
+    interval(15000)
+      .pipe(
+        startWith(null),
+        takeUntil(this.unsub)
+      )
+      .subscribe(() => this.updateVehiclePositions.emit('sf-muni'));
   }
 }
