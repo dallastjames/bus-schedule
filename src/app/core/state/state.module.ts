@@ -19,9 +19,15 @@ export { RoutesState, VehiclesState };
   imports: [
     CommonModule,
     NgxsModule.forRoot([RoutesState, VehiclesState], {
-      developmentMode: !environment.production
+      developmentMode: false,
+      selectorOptions: {
+        injectContainerState: false,
+        suppressErrors: false
+      }
     }),
-    NgxsStoragePluginModule.forRoot(),
+    NgxsStoragePluginModule.forRoot({
+      key: ['busRoutes']
+    }),
     NgxsEmitPluginModule.forRoot(),
     NgxsDispatchPluginModule.forRoot(),
     NgxsReduxDevtoolsPluginModule.forRoot({

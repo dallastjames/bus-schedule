@@ -23,9 +23,7 @@ export class RouteListComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {
-    console.log('init2');
-  }
+  ngOnInit() {}
 
   trackByFn: TrackByFunction<Route> = (index, item) => item.title;
 }

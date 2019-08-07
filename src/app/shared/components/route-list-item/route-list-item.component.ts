@@ -22,7 +22,5 @@ export class RouteListItemComponent implements OnInit {
 
   constructor() {}
 
-  ngOnInit() {
-    console.log('init');
-  }
+  ngOnInit() {}
 }

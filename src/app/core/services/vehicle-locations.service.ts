@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 
-import { Subject, Observable, bindNodeCallback } from 'rxjs';
+import { Observable, bindNodeCallback } from 'rxjs';
 import { parseString, convertableToString } from 'xml2js';
 
 import { environment } from '@bus/env';
-import { VehicleLoctationsResponse, VehicleLocation } from '@bus/models';
+import { VehicleLocation } from '@bus/models';
 import { switchMap, map } from 'rxjs/operators';
 
 @Injectable({
@@ -18,6 +18,9 @@ export class VehicleLocationsService {
     agency: string,
     since: Date
   ): Observable<VehicleLocation[]> {
+    if (!(since instanceof Date)) {
+      since = new Date(0);
+    }
     let params = new HttpParams();
     params = params.append('command', 'vehicleLocations');
     params = params.append('a', agency);

@@ -6,7 +6,7 @@ import { Route } from '@bus/models';
 import { Emitter, Emittable } from '@ngxs-labs/emitter';
 
 @Component({
-  selector: 'bus-bus-map-container',
+  selector: 'bus-map-container',
   templateUrl: './bus-map-container.component.html',
   styleUrls: ['./bus-map-container.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -16,8 +16,12 @@ export class BusMapContainerComponent implements OnInit {
   routes$: Observable<Route[]>;
   @Emitter(RoutesState.toggleRoute)
   toggleRoute: Emittable<Route>;
+  @Emitter(RoutesState.loadRoutes)
+  loadRoutes: Emittable<string>;
 
-  constructor() {}
+  constructor() {
+    this.loadRoutes.emit('sf-muni');
+  }
 
   ngOnInit() {}
 }
