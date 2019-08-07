@@ -14,7 +14,7 @@
     "esModuleInterop": true,
     "types": ["jest", "googlemaps"],
     "typeRoots": ["node_modules/@types"],
-    "lib": ["es2016", "dom"],
+    "lib": ["es2017", "dom"],
     "module": "esnext",
     "paths": {
       "@bus/env": ["environments/environment.ts"],
