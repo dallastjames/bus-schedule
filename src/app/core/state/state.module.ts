@@ -19,7 +19,7 @@ export { RoutesState, VehiclesState };
   imports: [
     CommonModule,
     NgxsModule.forRoot([RoutesState, VehiclesState], {
-      developmentMode: false,
+      developmentMode: !environment.production,
       selectorOptions: {
         injectContainerState: false,
         suppressErrors: false
