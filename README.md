@@ -21,6 +21,10 @@ Standard workflow:
 
 The app is currently [deployed to github pages](https://dallastjames.github.io/bus-schedule/). Note that you have to allow loading of unsafe scripts in order for it to actually work currently.
 
-Notes about the project can be found here (TBD)
+Notes about the project can be found [here](https://docs.google.com/document/d/1Vzjfh_YT3HEXrQbhzMZIARdimjhOcOROKaPfaooQPTA/edit?usp=sharing)
 
-The final upgrade document can be found here (TBD)
+The final upgrade documents can be found here:
+
+- [Upgrade Guide](./docs/upgrade-guide.md)
+- [State Management](./docs/state-manageent.md)
+- [Best Practices](./docs/upgrade-guide.md)
