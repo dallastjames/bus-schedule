@@ -7,7 +7,7 @@ import {
   EventEmitter,
   TrackByFunction
 } from '@angular/core';
-import { Route } from '@bus/models';
+import { RouteSelection } from '@bus/models';
 
 @Component({
   selector: 'bus-route-list',
@@ -17,13 +17,16 @@ import { Route } from '@bus/models';
 })
 export class RouteListComponent implements OnInit {
   @Input()
-  routes: Route[] = [];
+  routes: RouteSelection[] = [];
+
+  // prettier-ignore
   @Output()
-  toggleRoute: EventEmitter<Route> = new EventEmitter<Route>();
+  toggleRoute: EventEmitter<RouteSelection>
+    = new EventEmitter<RouteSelection>();
 
   constructor() {}
 
   ngOnInit() {}
 
-  trackByFn: TrackByFunction<Route> = (index, item) => item.title;
+  trackByFn: TrackByFunction<RouteSelection> = (index, item) => item.title;
 }

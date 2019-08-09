@@ -1,17 +1,23 @@
 import { State, Selector, StateContext } from '@ngxs/store';
 import { ImmutableSelector, ImmutableContext } from '@ngxs-labs/immer-adapter';
 import { Receiver } from '@ngxs-labs/emitter';
-import { Route } from '@bus/models';
+import { Route, RouteSelection } from '@bus/models';
 import { RoutesService } from '@bus/services';
 
 interface RoutesStateModel {
-  routes: Route[];
+  agency: string;
+  availableRoutes: Route[];
+  selectedRouteTags: string[];
+  lastToggledRoutes: Route[];
 }
 
 @State<RoutesStateModel>({
-  name: 'busRoutes',
+  name: 'routes',
   defaults: {
-    routes: []
+    agency: '',
+    availableRoutes: [],
+    selectedRouteTags: [],
+    lastToggledRoutes: []
   }
 })
 export class RoutesState {
@@ -23,14 +29,32 @@ export class RoutesState {
 
   @Selector([RoutesState])
   @ImmutableSelector()
-  public static routes(state: RoutesStateModel): Route[] {
-    return state.routes;
+  static currentAgency(state: RoutesStateModel): string {
+    return state.agency;
   }
 
   @Selector([RoutesState])
   @ImmutableSelector()
-  public static selectedRoutes(state: RoutesStateModel): Route[] {
-    return state.routes.filter(route => route.selected === true);
+  static routesWithSelectionData(state: RoutesStateModel): RouteSelection[] {
+    return state.availableRoutes.map(route => ({
+      ...route,
+      selected: state.selectedRouteTags.includes(route.tag)
+    }));
+  }
+
+  @Selector([RoutesState])
+  @ImmutableSelector()
+  static lastToggledRoutes(state: RoutesStateModel): RouteSelection[] {
+    return state.lastToggledRoutes.map(route => ({
+      ...route,
+      selected: state.selectedRouteTags.includes(route.tag)
+    }));
+  }
+
+  @Selector([RoutesState])
+  @ImmutableSelector()
+  static selectedRouteTags(state: RoutesStateModel): string[] {
+    return state.selectedRouteTags;
   }
 
   @Receiver()
@@ -39,40 +63,42 @@ export class RoutesState {
     { setState, getState }: StateContext<RoutesStateModel>,
     { payload }: { payload: string }
   ): Promise<void> {
-    const currentRoutes = getState().routes;
     const routes = await RoutesState.routesService
       .loadAllRoutes(payload)
       .toPromise();
-    const mergedRoutes = routes.map(route => {
-      const routeInState = currentRoutes.find(r => route.title === r.title);
-      if (!!routeInState) {
-        route.selected = routeInState.selected;
-      } else {
-        route.selected = false;
-      }
-      return route;
-    });
+    const availableRouteTags = routes.map(route => route.tag);
     setState((state: RoutesStateModel) => {
-      state.routes = mergedRoutes;
+      state.agency = payload;
+      state.availableRoutes = routes;
+      state.selectedRouteTags = state.selectedRouteTags.filter(tag =>
+        availableRouteTags.includes(tag)
+      );
+      state.lastToggledRoutes = state.availableRoutes
+        .filter(route => !availableRouteTags.includes(route.tag))
+        .map(route => ({ ...route, selected: false }));
       return state;
     });
   }
 
   @Receiver()
   @ImmutableContext()
-  public static async toggleRoute(
+  static async toggleRoute(
     { setState }: StateContext<RoutesStateModel>,
     { payload }: { payload: Route }
   ): Promise<void> {
-    let updatedRoutes: Route[];
     setState((state: RoutesStateModel) => {
-      const routeIndex = state.routes.findIndex(r => r.title === payload.title);
-      if (routeIndex > -1) {
-        const route = state.routes[routeIndex];
-        route.selected = !route.selected;
-        state.routes[routeIndex] = route;
-        updatedRoutes = state.routes;
+      const selectedRouteIndex = state.selectedRouteTags.indexOf(payload.tag);
+      if (selectedRouteIndex > -1) {
+        // Route is selected, so we need to unselect it
+        state.selectedRouteTags = [
+          ...state.selectedRouteTags.slice(0, selectedRouteIndex),
+          ...state.selectedRouteTags.slice(selectedRouteIndex + 1)
+        ];
+      } else {
+        // Route is not selected, so we need to select it
+        state.selectedRouteTags = [...state.selectedRouteTags, payload.tag];
       }
+      state.lastToggledRoutes = [payload];
       return state;
     });
   }

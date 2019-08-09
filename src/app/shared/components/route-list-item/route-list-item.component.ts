@@ -6,7 +6,7 @@ import {
   Output,
   EventEmitter
 } from '@angular/core';
-import { Route } from '@bus/models';
+import { RouteSelection } from '@bus/models';
 
 @Component({
   selector: 'bus-route-list-item',
@@ -16,9 +16,9 @@ import { Route } from '@bus/models';
 })
 export class RouteListItemComponent implements OnInit {
   @Input()
-  route: Route;
+  route: RouteSelection;
   @Output()
-  toggle: EventEmitter<Route> = new EventEmitter<Route>();
+  toggle: EventEmitter<RouteSelection> = new EventEmitter<RouteSelection>();
 
   constructor() {}
 

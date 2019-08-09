@@ -4,7 +4,6 @@ import { NgxsModule } from '@ngxs/store';
 import { NgxsStoragePluginModule } from '@ngxs/storage-plugin';
 import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
 import { NgxsEmitPluginModule } from '@ngxs-labs/emitter';
-import { NgxsDispatchPluginModule } from '@ngxs-labs/dispatch-decorator';
 
 import { throwIfAlreadyLoaded } from '../module-import-guard';
 import { environment } from '@bus/env';
@@ -25,11 +24,8 @@ export { RoutesState, VehiclesState };
         suppressErrors: false
       }
     }),
-    NgxsStoragePluginModule.forRoot({
-      key: ['busRoutes']
-    }),
+    NgxsStoragePluginModule.forRoot(),
     NgxsEmitPluginModule.forRoot(),
-    NgxsDispatchPluginModule.forRoot(),
     NgxsReduxDevtoolsPluginModule.forRoot({
       disabled: environment.production
     })

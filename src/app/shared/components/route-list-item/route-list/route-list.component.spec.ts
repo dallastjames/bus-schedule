@@ -1,7 +1,7 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { RouteListComponent } from './route-list.component';
-import { RouteListItemComponent } from '../route-list-item/route-list-item.component';
+import { RouteListItemComponent } from '../route-list-item.component';
 import { MatListModule } from '@angular/material/list';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 

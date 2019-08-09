@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Select } from '@ngxs/store';
 import { Observable } from 'rxjs';
 import { RoutesState } from '@bus/state';
-import { Route } from '@bus/models';
+import { RouteSelection } from '@bus/models';
 import { Emitter, Emittable } from '@ngxs-labs/emitter';
 
 @Component({
@@ -12,10 +12,10 @@ import { Emitter, Emittable } from '@ngxs-labs/emitter';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BusMapContainerComponent implements OnInit {
-  @Select(RoutesState.routes)
-  routes$: Observable<Route[]>;
+  @Select(RoutesState.routesWithSelectionData)
+  routes$: Observable<RouteSelection[]>;
   @Emitter(RoutesState.toggleRoute)
-  toggleRoute: Emittable<Route>;
+  toggleRoute: Emittable<RouteSelection>;
   @Emitter(RoutesState.loadRoutes)
   loadRoutes: Emittable<string>;
 
