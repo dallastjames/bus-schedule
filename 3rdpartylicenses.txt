@@ -100,9 +100,6 @@ THE SOFTWARE.
 @angular/platform-browser
 MIT
 
-@ngxs-labs/dispatch-decorator
-MIT
-
 @ngxs-labs/emitter
 MIT
 
