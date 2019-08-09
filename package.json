@@ -9,6 +9,7 @@
     "test": "ng test",
     "lint": "ng lint --type-check",
     "e2e": "ng e2e",
+    "deploy": "ng deploy --base-href /bus-schedule/",
     "format:check": "prettier --config .prettierrc --check src/**"
   },
   "private": true,
