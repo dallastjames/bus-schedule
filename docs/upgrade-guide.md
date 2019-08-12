@@ -54,6 +54,42 @@ done by updating npm, either by installing the latest version of node or running
 $ npm install -g npm@latest
 ```
 
+## Update TSLint
+
+As the first step in our update process, we will update TSLint to latest.
+
+> the `-D` flag is used to install as a devdepedency
+
+```sh
+$ npm i -D tslint@latest
+```
+
+There are 5 lint rules that no longer have implementations or that have been
+deprecated in the current version of TSLint that we should remove.
+
+- no-access-missing-member
+- templates-use-public
+- invoke-injectable
+- no-use-before-declare
+- typeof-compare
+
+Additionally, there are 2 rules with invalid configurations. They are corrected
+by using the following: (for information on how to use each rule [see this page](https://palantir.github.io/tslint/rules/)).
+
+```json
+"member-ordering": [
+    true,
+    {
+        "order": "fields-first"
+    }
+],
+
+"semicolon": [true, "always"],
+```
+
+Fixing these rules will show reveal several TSLint errors that will need to be
+cleaned.
+
 ## Update the Angular CLI
 
 We will update the Angular CLI to latest stable. This can be done by running
@@ -257,8 +293,8 @@ it('loads the data for the agency', () => {
   // We expect that the request method was a GET request
   expect(req.request.method).toEqual('GET');
   // For this test, we aren't checking the response so we just flush the request
-  // with a null response
-  req.flush(null);
+  // with an empty response
+  req.flush('<body></body>');
 });
 ```
 
@@ -366,7 +402,7 @@ path to help with the tree-shakability of the code (reducing final bundle size).
 #### Affected Files
 
 - app.module.ts
-- app.compoent.spec.ts
+- app.component.spec.ts
 
 ```typescript
 import { MatIconModule } from '@angular/material/icon';
@@ -406,6 +442,19 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
     imports: [BrowserAnimationsModule]
+})
+```
+
+In our test files, we also need to add animation support to avoid any errors,
+however, we don't want to actually load and execute any animations during tests.
+To accomplish this, we use the `NoopAnimationsModule` (short for no operation
+animations module).
+
+```typescript
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+
+@NgModule({
+    imports: [NoopAnimationsModule]
 })
 ```
 
