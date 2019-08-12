@@ -533,6 +533,8 @@ $ npm uninstall angular-2-local-storage
 The application is now successfully updated to latest! In the next step we will
 integrate a state management solution into the application.
 
+### OR
+
 > Only run this command if you are **not** planning on following the State Management
 > guide provided.
 
