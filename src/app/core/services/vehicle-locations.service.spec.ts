@@ -24,7 +24,7 @@ describe('VehicleLocationService', () => {
   });
 
   describe('getLatestVehicleLocations', () => {
-    it('loads the data for the agency using the passed "since" ms timestamp', () => {
+    it('loads the data for the agency using the passed "since" Date', () => {
       service
         .getLatestVehicleLocations('umn-twin', new Date(1499622348293))
         .subscribe();

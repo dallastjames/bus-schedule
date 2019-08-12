@@ -30,6 +30,7 @@ describe('RoutesService', () => {
       const url = `${environment.dataServiceUrl}?command=routeList&a=sf-muni`;
       const req = httpController.expectOne(url);
       expect(req).toBeTruthy();
+      expect(req.request.method).toEqual('GET');
 
       req.flush(null);
     });
