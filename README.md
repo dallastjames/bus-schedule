@@ -26,5 +26,5 @@ Notes about the project can be found [here](https://docs.google.com/document/d/1
 The final upgrade documents can be found here:
 
 - [Upgrade Guide](./docs/upgrade-guide.md)
-- [State Management](./docs/state-manageent.md)
-- [Best Practices](./docs/upgrade-guide.md)
+- [State Management](./docs/state-management.md)
+- [Best Practices](./docs/best-practices.md)
