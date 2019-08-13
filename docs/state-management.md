@@ -158,14 +158,14 @@ import { State } from '@ngxs/store';
 
 interface VehiclesStateModel {
   vehicleInformation: VehicleLocation[];
-  lastRequestTime: Date;
+  lastRequestTime: number;
 }
 
 @State<VehiclesStateModel>({
   name: 'vehicles',
   defaults: {
     vehicleInformation: [],
-    lastRequestTime: new Date(0)
+    lastRequestTime: 0
   }
 })
 export class VehiclesState {}
@@ -233,8 +233,19 @@ the requester, as opposed to making that data available through a subject. We
 no longer want to expose that data here, rather we want the store to consume it
 and make it available through [selectors](#Select).
 
+> For type information to work correctly, we need to install the types for
+> the xml2js library. This can be done with
+>
+> ```sh
+> $ npm i -D @types/xml2js
+> ```
+>
+> This will install the types for this library and make them available here.
+
 ```typescript
+import { Observable, bindNodeCallback } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
+import { parseString, convertableToString } from 'xml2js';
 
 export class RoutesService {
   refresh(agency: string): Observable<Route[]> {
@@ -248,11 +259,15 @@ export class RoutesService {
       })
       .pipe(
         /**
-         * Use rxjs switchMap operator to parse XML string and return
+         * Use rxjs switchMap and bindNodeCallback operators to parse XML string and return
          * the response as an observable
          */
         switchMap(xml =>
-          bindNodeCallback(parseString)(xml, {
+          bindNodeCallback<
+            convertableToString,
+            any,
+            { body: { route: Route[] } }
+          >(parseString)(xml, {
             explicitArray: false,
             mergeAttrs: true
           })
@@ -289,3 +304,391 @@ export class RoutesService {
   }
 }
 ```
+
+Next, we will connect this data with our store and create a way for our
+`AppComponent` to populate it. To do this, we will create a new loadRoutes
+static method in our `routes.state.ts` file. We will also create a handful of
+selectors here that will be used to select data from this state.
+
+> We also need to create a new interface for the Routes with selection information
+> We will call this `RouteSelection` and it extends the existing `Routes` interface
+> and adds an additional `selected: boolean` field to the class.
+
+```typescript
+import { Receiver, EmitterAction } from '@ngxs-labs/emitter';
+import { ImmutableSelector, ImmutableContext } from '@ngxs-labs/immer-adapter';
+
+@State<RoutesStateModel>(...)
+export class RoutesState {
+  private static routesService: RoutesService;
+
+  constructor(routesService: RoutesService) {
+    // We can use Angular's DI system to get services and make
+    // them available in the static context of our state
+    RoutesState.routesService = routesService;
+  }
+
+  // This creates a selector that can be used to retrieve data from the store
+  // These selectors are memoized and only will emit a new value when the
+  // input properties change. For this selector, we are choosing to only select
+  // from the RoutesState
+  @Selector([RoutesState])
+  // ImmutableSelector decorator ensures that if we make any changes to the data
+  // they are kept immutable, allowing us to use methods such as Array.splice()
+  // without fear of mutation-related bugs
+  @ImmutableSelector()
+  static currentAgency(state: RoutesStateModel): string {
+    return state.agency;
+  }
+
+  @Selector([RoutesState])
+  @ImmutableSelector()
+  static routesWithSelectionData(state: RoutesStateModel): RouteSelection[] {
+    // Here we get the available routes and add the additional
+    // data information about whether or not this route is currently selected
+    return state.availableRoutes.map(route => ({
+      ...route,
+      selected: state.selectedRouteTags.includes(route.tag)
+    }));
+  }
+
+  @Selector([RoutesState])
+  @ImmutableSelector()
+  static lastToggledRoutes(state: RoutesStateModel): RouteSelection[] {
+    // Selects the last toggled routes and whether or not they are selected
+    // So the view can react to those changes as needed
+    return state.lastToggledRoutes.map(route => ({
+      ...route,
+      selected: state.selectedRouteTags.includes(route.tag)
+    }));
+  }
+
+  @Selector([RoutesState])
+  @ImmutableSelector()
+  static selectedRouteTags(state: RoutesStateModel): string[] {
+    return state.selectedRouteTags;
+  }
+
+  // Receiver Decorator configures this action to work with the Emitter decorator
+  @Receiver()
+  // ImmutableContext Decorator allows us to make any changes to the state
+  // within this method and the state with be changed without mutation,
+  // even if we use methods that mutate, such as Array.splice()
+  @ImmutableContext()
+  public static async loadRoutes(
+    { setState, getState }: StateContext<RoutesStateModel>,
+    { payload }: EmitterAction<string>
+  ): Promise<void> {
+    // Get all routes, turning our observable into a promise here for easy
+    // state manipulation with async/await
+    const routes = await RoutesState.routesService.refresh(payload).toPromise();
+    const availableRouteTags = routes.map(route => route.tag);
+    setState((state: RoutesStateModel) => {
+      // Our payload is the agency requested
+      state.agency = payload;
+      // We set the available routes from the API response
+      state.availableRoutes = routes;
+      // We filter any selected routes that may not be selected anymore
+      // due to us changing agencies
+      state.selectedRouteTags = state.selectedRouteTags.filter(tag =>
+        availableRouteTags.includes(tag)
+      );
+      // If we need to deselect any routes from refreshing the data or by
+      // changing the agency, we do that here by identifying them and
+      // marking them as toggled
+      state.lastToggledRoutes = state.availableRoutes
+        .filter(route => !availableRouteTags.includes(route.tag))
+        .map(route => ({ ...route, selected: false }));
+      return state;
+    });
+  }
+}
+```
+
+Finally, we need to connect our `RoutesState` with our app component. This makes
+use of more decorators from NGXS. Since our route data will be in an observable
+now, we will also make use of the async pipe to pass this route data to our
+`bus-route-list` component.
+
+```typescript
+@Component(...)
+export class AppComponent {
+    // Select the routes with selection data
+    @Select(RoutesState.routesWithSelectionData)
+    routes$: Observable<RouteSelection[]>;
+    // Configure an emitter that we will call to load new route data
+    @Emitter(RoutesState.loadRoutes)
+    loadRoutes: Emittable<string>;
+
+    constructor() {
+        // We want to load routes for our current agency
+        this.loadRoutes.emit('sf-muni');
+    }
+
+    ngOnInit() {}
+}
+```
+
+```html
+<!-- app.component.html -->
+
+<bus-route-list [routes]="routes$ | async"></bus-route-list>
+```
+
+#### Selecting Routes
+
+Now that we have the routes loaded into our view, we need to notify the store
+when a user clicks on one of the routes to select it. This will involve adding
+a new `Receiver` into our state and connecting it to our `bus-route-item`
+component.
+
+```typescript
+export class RoutesState {
+  @Receiver()
+  @ImmutableContext()
+  static async toggleRoute(
+    { setState }: StateContext<RoutesStateModel>,
+    { payload }: EmitterAction<Route>
+  ): Promise<void> {
+    setState((state: RoutesStateModel) => {
+      const selectedRouteIndex = state.selectedRouteTags.indexOf(payload.tag);
+      if (selectedRouteIndex > -1) {
+        // Route is selected, so we need to unselect it
+        state.selectedRouteTags = [
+          ...state.selectedRouteTags.slice(0, selectedRouteIndex),
+          ...state.selectedRouteTags.slice(selectedRouteIndex + 1)
+        ];
+      } else {
+        // Route is not selected, so we need to select it
+        state.selectedRouteTags = [...state.selectedRouteTags, payload.tag];
+      }
+      state.lastToggledRoutes = [payload];
+      return state;
+    });
+  }
+}
+```
+
+> We changed the type information on the `RouteItemComponent` since we are passing
+> the RouteSelection data now instead of just the route. It would be good code
+> hygeine to make this same change in the `RouteListComponent`.
+
+```typescript
+export class RouteItemComponent {
+  // Note that we changed the type here
+  @Input() route: RouteSelection;
+  @Emitter(RoutesState.toggleRoute)
+  toggleRoute: Emittable<Route>;
+
+  constructor() {}
+}
+```
+
+```html
+<!-- route-item.component.html -->
+
+<mat-checkbox [checked]="route.selected" (change)="toggleRoute.emit(route)">
+  {{ route.title }}
+</mat-checkbox>
+```
+
+With these changes our `RoutesState` is now complete. Next we will integrate our
+`VehiclesState` into our application to truely make our application reactive.
+
+### Tracking Vehicle Information
+
+Integrating the vehicle information into our state will follow the same pattern
+that we just followed with our routes state. For this reason, this section will
+be brief, only showing the relavent parts of the code to note and not as much
+information on the exact implementation details.
+
+As with the `RoutesService` we need to adjust the refresh method to return its
+response as an observable as opposed to storing it in a subject.
+
+```typescript
+export class VehicleLocationsService {
+  refresh(agency: string, since?: number): Observable<VehicleLocation[]> {
+    return this.http
+      .get(environment.dataServiceUrl, {
+        params: {
+          command: 'vehicleLocations',
+          a: agency,
+          t: since ? since.toString() : '0'
+        },
+        responseType: 'text'
+      })
+      .pipe(
+        switchMap(xml =>
+          bindNodeCallback<
+            convertableToString,
+            any,
+            { body: { vehicle: VehicleLocation[] } }
+            // tslint:disable-next-line: ter-func-call-spacing
+          >(parseString)(xml, {
+            explicitArray: false,
+            mergeAttrs: true
+          })
+        ),
+        map(parsedXML => {
+          if (!!parsedXML && !!parsedXML.body && !!parsedXML.body.vehicle) {
+            if (Array.isArray(parsedXML.body.vehicle)) {
+              return parsedXML.body.vehicle;
+            } else {
+              return [parsedXML.body.vehicle as VehicleLocation];
+            }
+          }
+          return [];
+        })
+      );
+  }
+}
+```
+
+Our `VehiclesState` can then be updated to add both the `Receiver` to trigger
+fetching the data in addition to the selector to retrieve the data
+
+```typescript
+export class VehiclesState {
+  private static vehicleLocationsService: VehicleLocationsService;
+
+  constructor(vehicleLocationsService: VehicleLocationsService) {
+    VehiclesState.vehicleLocationsService = vehicleLocationsService;
+  }
+
+  @Selector([VehiclesState])
+  @ImmutableSelector()
+  public static vehicleInformation(
+    state: VehiclesStateModel
+  ): VehicleLocation[] {
+    return state.vehicleInformation;
+  }
+
+  @Receiver()
+  @ImmutableContext()
+  public static async requestUpdate(
+    { setState, getState }: StateContext<VehiclesStateModel>,
+    { payload }: EmitterAction<string>
+  ): Promise<void> {
+    const currentState = getState();
+    const lastRequestTime = currentState.lastRequestTime;
+    const locations = await VehiclesState.vehicleLocationsService
+      .refresh(payload, lastRequestTime)
+      .toPromise();
+
+    setState((state: VehiclesStateModel) => {
+      state.vehicleInformation = locations;
+      state.lastRequestTime = new Date().getTime();
+      return state;
+    });
+  }
+}
+```
+
+Finally, we connect these pieces to our `VehicleLocationMapComponent`.
+
+> Learn more about using `takeUntil` to unsubscribe [here](https://stackoverflow.com/questions/38008334/angular-rxjs-when-should-i-unsubscribe-from-subscription/41177163#41177163)
+> and [here](https://medium.com/@benlesh/rxjs-dont-unsubscribe-6753ed4fda87)
+
+```typescript
+export class VehicleLocationMapComponent
+  implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('vehicleLocationMap', { static: true, read: ElementRef })
+  mapEl: ElementRef<HTMLDivElement>;
+
+  // Configure our emitter that we will use to request to update the vehicle
+  // location information
+  @Emitter(VehiclesState.requestUpdate)
+  updateVehiclePositions: Emittable<string>;
+  // Select the current agency so we can use it in our requestUpdate payload
+  @Select(RoutesState.currentAgency)
+  currentAgency$: Observable<string>;
+  // Select the last toggled routes so we can toggle the vehicle icons on the map
+  @Select(RoutesState.lastToggledRoutes)
+  toggledRoutes$: Observable<RouteSelection[]>;
+  // Select the selected route tags so we can toggle the vehicle icons on the map
+  @Select(RoutesState.selectedRouteTags)
+  selectedRouteTags$: Observable<string[]>;
+  // Select the vehicle information so we can place the icons on the map
+  @Select(VehiclesState.vehicleInformation)
+  vehicles$: Observable<VehicleLocation[]>;
+
+  private map: google.maps.Map;
+  // We will use this unsub variable to unsubscribe from our observables when
+  // the component is destroyed to prevent memory leaks.
+  private unsub: Subject<void> = new Subject<void>();
+  private markerCollection: MarkerCollection;
+
+  constructor() {}
+
+  ngOnInit() {}
+
+  ngAfterViewInit() {
+    this.createMap();
+    this.createIntervalUpdater();
+    this.createMarkerWatcher();
+  }
+
+  ngOnDestroy() {
+    this.unsub.next();
+    this.unsub.complete();
+  }
+
+  private createMap() {
+    this.map = new google.maps.Map(this.mapEl.nativeElement, {
+      center: new google.maps.LatLng(37.7749, -122.4194),
+      zoom: 12,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    });
+    this.markerCollection = new MarkerCollection(this.map);
+  }
+
+  private createMarkerWatcher() {
+    this.vehicles$
+      .pipe(
+        // We take our vehicle information together with the selected route tags
+        // so we can know if we should display the vehicle marker or not when
+        // its position changes
+        withLatestFrom(this.selectedRouteTags$),
+        takeUntil(this.unsub)
+      )
+      .subscribe(([vehicleData, selectedRouteTags]) => {
+        for (const vehicle of vehicleData) {
+          this.markerCollection.merge(
+            vehicle,
+            selectedRouteTags.includes(vehicle.routeTag)
+          );
+        }
+      });
+    this.toggledRoutes$
+      .pipe(takeUntil(this.unsub))
+      .subscribe(lastToggledRoutes => {
+        // Whenever a route is toggled, we can show or hide it by its tag
+        for (const route of lastToggledRoutes) {
+          if (route.selected) {
+            this.markerCollection.show(route.tag);
+          } else {
+            this.markerCollection.hide(route.tag);
+          }
+        }
+      });
+  }
+
+  private createIntervalUpdater() {
+    // We create an interval that runs every 15 seconds
+    interval(15000)
+      .pipe(
+        // Using startWith operator, it will immediately emit a value instead
+        // of waiting 15 seconds for the first interval value to omit
+        startWith(null),
+        // combine the data with the latest value from the currently viewed agency
+        withLatestFrom(this.currentAgency$),
+        takeUntil(this.unsub)
+      )
+      .subscribe(([_, agency]) => this.updateVehiclePositions.emit(agency));
+  }
+}
+```
+
+At this point, we have successfully integrated our state management solution
+into our application. Using `ng serve` our application should start up correctly
+and work same as before, with the added benefits of reactive state management.

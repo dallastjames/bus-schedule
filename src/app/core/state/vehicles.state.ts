@@ -1,6 +1,6 @@
 import { State, StateContext, Selector } from '@ngxs/store';
 import { VehicleLocation } from '@bus/models';
-import { Receiver } from '@ngxs-labs/emitter';
+import { Receiver, EmitterAction } from '@ngxs-labs/emitter';
 import { ImmutableContext, ImmutableSelector } from '@ngxs-labs/immer-adapter';
 import { VehicleLocationsService } from '@bus/services';
 
@@ -35,7 +35,7 @@ export class VehiclesState {
   @ImmutableContext()
   public static async requestUpdate(
     { setState, getState }: StateContext<VehiclesStateModel>,
-    { payload }: { payload: string }
+    { payload }: EmitterAction<string>
   ): Promise<void> {
     const currentState = getState();
     const lastRequestTime = currentState.lastRequestTime;

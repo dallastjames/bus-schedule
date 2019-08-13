@@ -1,6 +1,6 @@
 import { State, Selector, StateContext } from '@ngxs/store';
 import { ImmutableSelector, ImmutableContext } from '@ngxs-labs/immer-adapter';
-import { Receiver } from '@ngxs-labs/emitter';
+import { Receiver, EmitterAction } from '@ngxs-labs/emitter';
 import { Route, RouteSelection } from '@bus/models';
 import { RoutesService } from '@bus/services';
 
@@ -61,7 +61,7 @@ export class RoutesState {
   @ImmutableContext()
   public static async loadRoutes(
     { setState, getState }: StateContext<RoutesStateModel>,
-    { payload }: { payload: string }
+    { payload }: EmitterAction<string>
   ): Promise<void> {
     const routes = await RoutesState.routesService
       .loadAllRoutes(payload)
@@ -84,7 +84,7 @@ export class RoutesState {
   @ImmutableContext()
   static async toggleRoute(
     { setState }: StateContext<RoutesStateModel>,
-    { payload }: { payload: Route }
+    { payload }: EmitterAction<Route>
   ): Promise<void> {
     setState((state: RoutesStateModel) => {
       const selectedRouteIndex = state.selectedRouteTags.indexOf(payload.tag);

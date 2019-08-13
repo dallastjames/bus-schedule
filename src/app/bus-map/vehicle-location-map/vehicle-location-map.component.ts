@@ -82,7 +82,6 @@ export class VehicleLocationMapComponent
     this.toggledRoutes$
       .pipe(takeUntil(this.unsub))
       .subscribe(lastToggledRoutes => {
-        console.log('toggled routes', lastToggledRoutes);
         for (const route of lastToggledRoutes) {
           if (route.selected) {
             this.markerCollection.show(route.tag);
